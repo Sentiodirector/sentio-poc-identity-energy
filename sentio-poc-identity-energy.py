@@ -1,173 +1,256 @@
 """
-Classroom Engagement Heatmap & Group Analysis
-Template file with skeleton functions
+identity_energy.py
+Sentio Mind · Project 1 · Named Face Identity + Energy Report
+
+Copy this file to solution.py and fill in every TODO block.
+Do not rename any function — the integration system calls them by name.
+Run: python solution.py
 """
 
 import cv2
-import numpy as np
-import mediapipe as mp
-from typing import List, Dict, Tuple, Optional
 import json
-from datetime import datetime
-import os
+import base64
+import time
+import numpy as np
+from pathlib import Path
+from datetime import date
+
+# ---------------------------------------------------------------------------
+# CONFIG — edit these before running
+# ---------------------------------------------------------------------------
+KNOWN_FACES_DIR  = Path("known_faces")
+VIDEO_PATH       = Path("video_sample_1.mov")
+REPORT_HTML_OUT  = Path("report.html")
+INTEGRATION_OUT  = Path("integration_output.json")
+
+SCHOOL_NAME      = "Demo School"   # change this
+MATCH_THRESHOLD  = 0.55            # 0.55 works well for CCTV quality; lower = stricter
+MAX_KEYFRAMES    = 20              # how many frames to sample from the video
 
 
-class ClassroomEngagementAnalyzer:
-    """Main class for classroom engagement analysis"""
-    
-    def __init__(self, video_path: str):
-        """
-        Initialize the analyzer with video path
-        
-        Args:
-            video_path: Path to input video file
-        """
-        self.video_path = video_path
-        self.cap = cv2.VideoCapture(video_path)
-        self.fps = self.cap.get(cv2.CAP_PROP_FPS)
-        self.frame_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.frame_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        
-        # Initialize MediaPipe Face Detection
-        self.mp_face_detection = mp.solutions.face_detection
-        self.face_detection = self.mp_face_detection.FaceDetection(
-            model_selection=1, min_detection_confidence=0.5
-        )
-        
-        # Data storage
-        self.timeline_data = []  # Engagement scores every 6 seconds
-        self.zone_data = {}      # Zone-wise engagement
-        self.gaze_data = []      # Gaze direction per detection
-        self.worst_windows = []  # Bottom 3 engagement windows
-        
-    def calculate_engagement_score(self, face_detections: List) -> float:
-        """
-        TODO: Calculate engagement score for current frame
-        - Face presence (weight: 0.4)
-        - Gaze direction (weight: 0.3)
-        - Face position (weight: 0.3)
-        
-        Args:
-            face_detections: List of face detections from MediaPipe
-            
-        Returns:
-            float: Engagement score (0-100)
-        """
-        pass
-    
-    def estimate_gaze_direction(self, face_landmarks) -> str:
-        """
-        TODO: Estimate gaze direction from face landmarks
-        Returns: 'forward', 'left', 'right', 'down', 'up'
-        """
-        pass
-    
-    def get_spatial_zone(self, face_bbox: Tuple) -> str:
-        """
-        TODO: Calculate spatial zone for face position
-        
-        Args:
-            face_bbox: (x, y, w, h) face bounding box
-            
-        Returns:
-            str: Zone ID in format 'R{row}C{col}'
-        """
-        pass
-    
-    def process_frame(self, frame: np.ndarray, timestamp: float) -> Dict:
-        """
-        TODO: Process single frame - detect faces, calculate engagement
-        
-        Args:
-            frame: Input video frame
-            timestamp: Frame timestamp in seconds
-            
-        Returns:
-            Dict: Frame analysis results
-        """
-        pass
-    
-    def aggregate_6second_windows(self) -> List[Dict]:
-        """
-        TODO: Aggregate frame data into 6-second windows
-        Returns list of window summaries
-        """
-        pass
-    
-    def identify_worst_windows(self, num_windows: int = 3) -> List[Dict]:
-        """
-        TODO: Identify bottom N engagement windows
-        """
-        pass
-    
-    def generate_heatmap_data(self) -> Dict:
-        """
-        TODO: Generate spatial heatmap data for 4×6 grid
-        """
-        pass
-    
-    def analyze(self) -> Dict:
-        """
-        Main analysis pipeline
-        """
-        results = {
-            'video_metadata': {
-                'fps': self.fps,
-                'frame_count': self.total_frames,
-                'duration': self.total_frames / self.fps,
-                'resolution': f"{self.frame_width}x{self.frame_height}"
-            },
-            'timeline': [],
-            'spatial_heatmap': {},
-            'worst_windows': [],
-            'gaze_statistics': {}
-        }
-        
-        # TODO: Implement main analysis loop
-        # 1. Process frames
-        # 2. Aggregate into 6-second windows
-        # 3. Calculate zone engagement
-        # 4. Identify worst windows
-        # 5. Compile gaze statistics
-        
-        return results
-    
-    def export_json(self, output_path: str):
-        """Export results to JSON"""
-        results = self.analyze()
-        with open(output_path, 'w') as f:
-            json.dump(results, f, indent=2)
-    
-    def generate_html_report(self, output_path: str):
-        """Generate HTML dashboard"""
-        # TODO: Create HTML with:
-        # - Line chart (Chart.js/D3.js inline)
-        # - 4×6 heatmap grid
-        # - Worst 3 windows with thumbnails
-        # - Gaze distribution pie chart
-        pass
-    
-    def __del__(self):
-        if hasattr(self, 'cap'):
-            self.cap.release()
+# ---------------------------------------------------------------------------
+# STEP 1 — Load reference photos
+# ---------------------------------------------------------------------------
+
+def load_known_faces(folder: Path) -> dict:
+    """
+    Read every image from the folder.
+    The filename without extension is the person's name.
+    Encode each face with face_recognition.
+    Return: { "Arjun Mehta": [128-d encoding, ...], ... }
+
+    If a photo has no detectable face, print a warning and skip it.
+    One person can have multiple photos — store all encodings in the list.
+
+    TODO: implement using face_recognition.load_image_file + face_encodings
+    """
+    known = {}
+    # TODO
+    return known
 
 
-def main():
-    """Main execution function"""
-    # TODO: Implement argument parsing
-    video_path = "video_sample_1.mov"
-    
-    analyzer = ClassroomEngagementAnalyzer(video_path)
-    
-    # Generate outputs
-    analyzer.export_json("engagement_output.json")
-    analyzer.generate_html_report("engagement_report.html")
-    
-    print("Analysis complete! Generated:")
-    print("  - engagement_output.json")
-    print("  - engagement_report.html")
+# ---------------------------------------------------------------------------
+# STEP 2 — Extract keyframes from video
+# ---------------------------------------------------------------------------
 
+def extract_keyframes(video_path: Path, max_frames: int) -> list:
+    """
+    Open the video, pull up to max_frames evenly spaced frames.
+    Apply CLAHE on each frame to help with CCTV lighting.
+    Return: [(frame_index, numpy_array), ...]
+
+    TODO: use cv2.VideoCapture, compute step = total_frames // max_frames
+    """
+    frames = []
+    # TODO
+    return frames
+
+
+# ---------------------------------------------------------------------------
+# STEP 3 — Detect and match faces in one frame
+# ---------------------------------------------------------------------------
+
+def detect_and_match(frame: np.ndarray, known: dict, threshold: float) -> list:
+    """
+    Detect all faces in frame, compare each against known encodings.
+    Return a list of dicts — one per detected face:
+      {
+        "name":       str,          real name OR "UNKNOWN_001" etc.
+        "matched":    bool,
+        "confidence": float,        1.0 = perfect match
+        "bbox":       (x, y, w, h),
+        "face_crop":  np.ndarray
+      }
+
+    TODO: use face_recognition.face_locations, face_encodings, compare_faces
+    Assign UNKNOWN_001, UNKNOWN_002 etc. for faces that don't match anyone.
+    """
+    detections = []
+    # TODO
+    return detections
+
+
+# ---------------------------------------------------------------------------
+# STEP 4 — Energy components
+# ---------------------------------------------------------------------------
+
+def compute_face_brightness(face_crop: np.ndarray) -> float:
+    """
+    Grayscale mean pixel value scaled to 0–100.
+    TODO: cv2.cvtColor BGR->GRAY, np.mean, divide by 2.55
+    """
+    # TODO
+    return 50.0
+
+
+def compute_eye_openness(face_crop: np.ndarray) -> float:
+    """
+    Average of (eye height / eye width) for left and right eye, scaled 0–100.
+    Use MediaPipe Face Mesh to find eye landmarks.
+    If MediaPipe fails, return 50.0 as a neutral fallback.
+    TODO: implement
+    """
+    # TODO
+    return 50.0
+
+
+def compute_movement(prev_frame, curr_frame: np.ndarray, bbox: tuple) -> float:
+    """
+    Dense optical flow magnitude in the face bounding box region, scaled 0–100.
+    If prev_frame is None (first frame) return 0.0.
+    TODO: cv2.calcOpticalFlowFarneback on grayscale face crops
+    """
+    if prev_frame is None:
+        return 0.0
+    # TODO
+    return 0.0
+
+
+# ---------------------------------------------------------------------------
+# STEP 5 — Aggregate across all frames into per-person summaries
+# ---------------------------------------------------------------------------
+
+def aggregate_persons(all_detections: list) -> list:
+    """
+    all_detections is a flat list of dicts from previous steps, each containing:
+      name, matched, confidence, face_crop, brightness, eye_openness, movement, frame_idx
+
+    Group by name.
+    For each person:
+      - average the three energy components
+      - compute energy_score = brightness*0.35 + eye*0.30 + movement*0.35
+      - pick the sharpest face_crop as the profile image
+      - encode that crop as 240×240 base64 JPEG
+
+    Return a list matching the "persons" array in identity_energy.json.
+    TODO: implement
+    """
+    persons = []
+    # TODO
+    return persons
+
+
+def encode_b64(img: np.ndarray, size=(240, 240)) -> str:
+    """Resize to size, encode as JPEG, return base64 string."""
+    resized = cv2.resize(img, size, interpolation=cv2.INTER_LANCZOS4)
+    _, buf = cv2.imencode(".jpg", resized, [cv2.IMWRITE_JPEG_QUALITY, 92])
+    return base64.b64encode(buf).decode("utf-8")
+
+
+def verdict(score: float) -> str:
+    """Returns 'high', 'moderate', or 'low'."""
+    return "high" if score >= 75 else "moderate" if score >= 50 else "low"
+
+
+# ---------------------------------------------------------------------------
+# STEP 6 — HTML report
+# ---------------------------------------------------------------------------
+
+def generate_report(persons: list, output_path: Path):
+    """
+    Write a self-contained HTML file to output_path.
+    For each person include: profile photo (embedded), name, energy bar, breakdown, verdict.
+    Inline CSS only — no CDN, no external links, must work offline.
+    Keep it clean — school staff will read this, not engineers.
+    TODO: build HTML string, write to file
+    """
+    # TODO
+    pass
+
+
+# ---------------------------------------------------------------------------
+# STEP 7 — Integration JSON
+# ---------------------------------------------------------------------------
+
+def write_integration_json(persons: list, output_path: Path,
+                            video_name: str, processing_time: float):
+    """
+    Write integration_output.json following identity_energy.json exactly.
+    Do not add or remove top-level keys.
+    TODO: implement
+    """
+    output = {
+        "source": "p1_identity_energy",
+        "school": SCHOOL_NAME,
+        "date": str(date.today()),
+        "video_file": video_name,
+        "total_persons_matched": sum(1 for p in persons if p.get("matched")),
+        "total_persons_unknown": sum(1 for p in persons if not p.get("matched")),
+        "processing_time_sec": processing_time,
+        "persons": persons,
+    }
+    with open(output_path, "w") as f:
+        json.dump(output, f, indent=2)
+
+
+# ---------------------------------------------------------------------------
+# MAIN
+# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    main()
+    t0 = time.time()
+
+    print("Step 1 — loading known faces ...")
+    known = load_known_faces(KNOWN_FACES_DIR)
+    if not known:
+        print("  ERROR: no faces loaded. Check known_faces/ has images named like 'Arjun Mehta.jpg'")
+        raise SystemExit(1)
+    print(f"  {len(known)} persons: {', '.join(list(known.keys())[:6])}")
+
+    print("Step 2 — extracting keyframes ...")
+    frames = extract_keyframes(VIDEO_PATH, MAX_KEYFRAMES)
+    print(f"  {len(frames)} frames extracted")
+
+    print("Step 3 & 4 — detecting + scoring faces ...")
+    all_detections = []
+    prev_frame = None
+    for frame_idx, frame in frames:
+        detections = detect_and_match(frame, known, MATCH_THRESHOLD)
+        for d in detections:
+            d["frame_idx"]    = frame_idx
+            d["brightness"]   = compute_face_brightness(d["face_crop"])
+            d["eye_openness"] = compute_eye_openness(d["face_crop"])
+            d["movement"]     = compute_movement(prev_frame, frame, d["bbox"])
+        all_detections.extend(detections)
+        prev_frame = frame
+
+    print("Step 5 — aggregating per-person ...")
+    persons = aggregate_persons(all_detections)
+
+    t1 = round(time.time() - t0, 2)
+
+    print("Step 6 — writing report.html ...")
+    generate_report(persons, REPORT_HTML_OUT)
+
+    print("Step 7 — writing integration_output.json ...")
+    write_integration_json(persons, INTEGRATION_OUT, str(VIDEO_PATH), t1)
+
+    print()
+    print("=" * 50)
+    print(f"  Finished in {t1}s")
+    print(f"  Persons found: {len(persons)}")
+    for p in persons:
+        print(f"    {p['name']:30s}  energy {p['energy_score']:5.1f}  ({p['verdict']})")
+    print(f"  report.html              -> {REPORT_HTML_OUT}")
+    print(f"  integration_output.json  -> {INTEGRATION_OUT}")
+    print("=" * 50)
