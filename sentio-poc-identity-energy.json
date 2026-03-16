@@ -1,91 +1,49 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Classroom Engagement Output Schema",
-  "description": "Integration data for Sentio Mind classroom engagement analysis",
-  "type": "object",
-  "required": ["video_id", "timestamp", "summary", "spatial_analysis", "temporal_analysis"],
-  "properties": {
-    "video_id": {
-      "type": "string",
-      "description": "Unique identifier for the video"
+  "_readme": "Your integration_output.json must match this structure exactly. The Sentio Mind ingestion script reads every key listed here. Do not add extra keys at the top level or rename existing ones.",
+
+  "source": "p1_identity_energy",
+  "school": "School Name Here",
+  "date": "YYYY-MM-DD",
+  "video_file": "video_sample_1.mov",
+  "total_persons_matched": 0,
+  "total_persons_unknown": 0,
+  "processing_time_sec": 0.0,
+
+  "persons": [
+    {
+      "person_id": "SCHOOL_P0001",
+      "name": "Arjun Mehta",
+      "matched": true,
+      "match_confidence": 0.87,
+      "profile_image_b64": "BASE64_JPEG_STRING_HERE",
+      "frames_detected": 14,
+      "energy_score": 72,
+      "energy_breakdown": {
+        "face_brightness": 80,
+        "eye_openness": 65,
+        "movement_activity": 70
+      },
+      "verdict": "moderate",
+      "first_seen_frame": 42,
+      "last_seen_frame": 310
     },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time",
-      "description": "Analysis generation timestamp"
-    },
-    "summary": {
-      "type": "object",
-      "required": ["overall_engagement", "peak_engagement_time", "lowest_engagement_time", "active_face_count_avg"],
-      "properties": {
-        "overall_engagement": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 100
-        },
-        "peak_engagement_time": {
-          "type": "number"
-        },
-        "lowest_engagement_time": {
-          "type": "number"
-        },
-        "active_face_count_avg": {
-          "type": "number"
-        }
-      }
-    },
-    "spatial_analysis": {
-      "type": "object",
-      "patternProperties": {
-        "^R[1-4]C[1-6]$": {
-          "type": "object",
-          "properties": {
-            "engagement_score": {"type": "number"},
-            "face_count": {"type": "integer"},
-            "dominant_gaze": {"type": "string", "enum": ["forward", "left", "right", "down", "up"]}
-          }
-        }
-      }
-    },
-    "temporal_analysis": {
-      "type": "object",
-      "properties": {
-        "windows": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "start_time": {"type": "number"},
-              "end_time": {"type": "number"},
-              "engagement_score": {"type": "number"},
-              "face_count": {"type": "integer"},
-              "gaze_breakdown": {
-                "type": "object",
-                "properties": {
-                  "forward": {"type": "number"},
-                  "left": {"type": "number"},
-                  "right": {"type": "number"},
-                  "down": {"type": "number"},
-                  "up": {"type": "number"}
-                }
-              }
-            }
-          }
-        },
-        "worst_windows": {
-          "type": "array",
-          "maxItems": 3,
-          "items": {
-            "type": "object",
-            "properties": {
-              "start_time": {"type": "number"},
-              "end_time": {"type": "number"},
-              "engagement_score": {"type": "number"},
-              "thumbnail_path": {"type": "string"}
-            }
-          }
-        }
-      }
+    {
+      "_note": "For unmatched faces set matched=false and name=UNKNOWN_001 etc.",
+      "person_id": "SCHOOL_P0002",
+      "name": "UNKNOWN_001",
+      "matched": false,
+      "match_confidence": 0.0,
+      "profile_image_b64": "BASE64_JPEG_STRING_HERE",
+      "frames_detected": 3,
+      "energy_score": 55,
+      "energy_breakdown": {
+        "face_brightness": 60,
+        "eye_openness": 50,
+        "movement_activity": 55
+      },
+      "verdict": "moderate",
+      "first_seen_frame": 88,
+      "last_seen_frame": 120
     }
-  }
+  ]
 }
