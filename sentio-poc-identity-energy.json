@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Classroom Engagement Output Schema",
+  "description": "Integration data for Sentio Mind classroom engagement analysis",
+  "type": "object",
+  "required": ["video_id", "timestamp", "summary", "spatial_analysis", "temporal_analysis"],
+  "properties": {
+    "video_id": {
+      "type": "string",
+      "description": "Unique identifier for the video"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Analysis generation timestamp"
+    },
+    "summary": {
+      "type": "object",
+      "required": ["overall_engagement", "peak_engagement_time", "lowest_engagement_time", "active_face_count_avg"],
+      "properties": {
+        "overall_engagement": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "peak_engagement_time": {
+          "type": "number"
+        },
+        "lowest_engagement_time": {
+          "type": "number"
+        },
+        "active_face_count_avg": {
+          "type": "number"
+        }
+      }
+    },
+    "spatial_analysis": {
+      "type": "object",
+      "patternProperties": {
+        "^R[1-4]C[1-6]$": {
+          "type": "object",
+          "properties": {
+            "engagement_score": {"type": "number"},
+            "face_count": {"type": "integer"},
+            "dominant_gaze": {"type": "string", "enum": ["forward", "left", "right", "down", "up"]}
+          }
+        }
+      }
+    },
+    "temporal_analysis": {
+      "type": "object",
+      "properties": {
+        "windows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "start_time": {"type": "number"},
+              "end_time": {"type": "number"},
+              "engagement_score": {"type": "number"},
+              "face_count": {"type": "integer"},
+              "gaze_breakdown": {
+                "type": "object",
+                "properties": {
+                  "forward": {"type": "number"},
+                  "left": {"type": "number"},
+                  "right": {"type": "number"},
+                  "down": {"type": "number"},
+                  "up": {"type": "number"}
+                }
+              }
+            }
+          }
+        },
+        "worst_windows": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "properties": {
+              "start_time": {"type": "number"},
+              "end_time": {"type": "number"},
+              "engagement_score": {"type": "number"},
+              "thumbnail_path": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
